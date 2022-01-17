@@ -42,13 +42,13 @@ contract ShareWrapper {
 }
 
 /*
-  ______                __       _______
- /_  __/___  ____ ___  / /_     / ____(_)___  ____ _____  ________
-  / / / __ \/ __ `__ \/ __ \   / /_  / / __ \/ __ `/ __ \/ ___/ _ \
- / / / /_/ / / / / / / /_/ /  / __/ / / / / / /_/ / / / / /__/  __/
-/_/  \____/_/ /_/ /_/_.___/  /_/   /_/_/ /_/\__,_/_/ /_/\___/\___/
+    ____        __           _         _______
+   / __ \____  / /___ ______(_)____   / ____(_)___  ____ _____  ________
+  / /_/ / __ \/ / __ `/ ___/ / ___/  / /_  / / __ \/ __ `/ __ \/ ___/ _ \
+ / ____/ /_/ / / /_/ / /  / (__  )  / __/ / / / / / /_/ / / / / /__/  __/
+/_/    \____/_/\__,_/_/  /_/____/  /_/   /_/_/ /_/\__,_/_/ /_/\___/\___/
 
-    http://tomb.finance
+    https://polarisfinance.io
 */
 contract Masonry is ShareWrapper, ContractGuard {
     using SafeERC20 for IERC20;
@@ -77,7 +77,7 @@ contract Masonry is ShareWrapper, ContractGuard {
     // flags
     bool public initialized = false;
 
-    IERC20 public tomb;
+    IERC20 public polar;
     ITreasury public treasury;
 
     mapping(address => Masonseat) public masons;
@@ -124,11 +124,11 @@ contract Masonry is ShareWrapper, ContractGuard {
     /* ========== GOVERNANCE ========== */
 
     function initialize(
-        IERC20 _tomb,
+        IERC20 _polar,
         IERC20 _share,
         ITreasury _treasury
     ) public notInitialized {
-        tomb = _tomb;
+        polar = _polar;
         share = _share;
         treasury = _treasury;
 
@@ -189,8 +189,8 @@ contract Masonry is ShareWrapper, ContractGuard {
         return treasury.nextEpochPoint();
     }
 
-    function getTombPrice() external view returns (uint256) {
-        return treasury.getTombPrice();
+    function getPolarPrice() external view returns (uint256) {
+        return treasury.getPolarPrice();
     }
 
     // =========== Mason getters
@@ -233,7 +233,7 @@ contract Masonry is ShareWrapper, ContractGuard {
             require(masons[msg.sender].epochTimerStart.add(rewardLockupEpochs) <= treasury.epoch(), "Masonry: still in reward lockup");
             masons[msg.sender].epochTimerStart = treasury.epoch(); // reset timer
             masons[msg.sender].rewardEarned = 0;
-            tomb.safeTransfer(msg.sender, reward);
+            polar.safeTransfer(msg.sender, reward);
             emit RewardPaid(msg.sender, reward);
         }
     }
@@ -253,13 +253,13 @@ contract Masonry is ShareWrapper, ContractGuard {
         });
         masonryHistory.push(newSnapshot);
 
-        tomb.safeTransferFrom(msg.sender, address(this), amount);
+        polar.safeTransferFrom(msg.sender, address(this), amount);
         emit RewardAdded(msg.sender, amount);
     }
 
     function governanceRecoverUnsupported(IERC20 _token, uint256 _amount, address _to) external onlyOperator {
         // do not allow to drain core tokens
-        require(address(_token) != address(tomb), "tomb");
+        require(address(_token) != address(polar), "polar");
         require(address(_token) != address(share), "share");
         _token.safeTransfer(_to, _amount);
     }

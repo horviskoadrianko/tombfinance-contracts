@@ -1,0 +1,7 @@
+{
+  "solidity.defaultCompiler": "remote",
+  "solidity.compileUsingRemoteVersion": "v0.6.12+commit.27d51765",
+  "solidity.compileUsingLocalVersion": "/home/horviskoadrianko/programovanie/ethereum/tomb_finance/tombfinance-contracts/contracts/soljson-v0.6.12+commit.27d51765.js",
+  "solidity.packageDefaultDependenciesContractsDirectory": "",
+  "solidity.packageDefaultDependenciesDirectory": "node_modules"
+}

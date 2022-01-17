@@ -8,18 +8,18 @@ import "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
 import "./owner/Operator.sol";
 
 /*
-  ______                __       _______
- /_  __/___  ____ ___  / /_     / ____(_)___  ____ _____  ________
-  / / / __ \/ __ `__ \/ __ \   / /_  / / __ \/ __ `/ __ \/ ___/ _ \
- / / / /_/ / / / / / / /_/ /  / __/ / / / / / /_/ / / / / /__/  __/
-/_/  \____/_/ /_/ /_/_.___/  /_/   /_/_/ /_/\__,_/_/ /_/\___/\___/
+    ____        __           _         _______
+   / __ \____  / /___ ______(_)____   / ____(_)___  ____ _____  ________
+  / /_/ / __ \/ / __ `/ ___/ / ___/  / /_  / / __ \/ __ `/ __ \/ ___/ _ \
+ / ____/ /_/ / / /_/ / /  / (__  )  / __/ / / / / / /_/ / / / / /__/  __/
+/_/    \____/_/\__,_/_/  /_/____/  /_/   /_/_/ /_/\__,_/_/ /_/\___/\___/
 
-    http://tomb.finance
+    https://polarisfinance.io
 */
-contract TShare is ERC20Burnable, Operator {
+contract Spolar is ERC20Burnable, Operator {
     using SafeMath for uint256;
 
-    // TOTAL MAX SUPPLY = 70,000 tSHAREs
+    // TOTAL MAX SUPPLY = 70,000 spolars
     uint256 public constant FARMING_POOL_REWARD_ALLOCATION = 59500 ether;
     uint256 public constant COMMUNITY_FUND_POOL_ALLOCATION = 5500 ether;
     uint256 public constant DEV_FUND_POOL_ALLOCATION = 5000 ether;
@@ -39,8 +39,8 @@ contract TShare is ERC20Burnable, Operator {
 
     bool public rewardPoolDistributed = false;
 
-    constructor(uint256 _startTime, address _communityFund, address _devFund) public ERC20("TSHARE", "TSHARE") {
-        _mint(msg.sender, 1 ether); // mint 1 TOMB Share for initial pools deployment
+    constructor(uint256 _startTime, address _communityFund, address _devFund) public ERC20("SPOLAR", "SPOLAR") {
+        _mint(msg.sender, 1 ether); // mint 1 POLAR Share for initial pools deployment
 
         startTime = _startTime;
         endTime = startTime + VESTING_DURATION;

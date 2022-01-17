@@ -10,22 +10,22 @@ import "./owner/Operator.sol";
 import "./interfaces/IOracle.sol";
 
 /*
-  ______                __       _______
- /_  __/___  ____ ___  / /_     / ____(_)___  ____ _____  ________
-  / / / __ \/ __ `__ \/ __ \   / /_  / / __ \/ __ `/ __ \/ ___/ _ \
- / / / /_/ / / / / / / /_/ /  / __/ / / / / / /_/ / / / / /__/  __/
-/_/  \____/_/ /_/ /_/_.___/  /_/   /_/_/ /_/\__,_/_/ /_/\___/\___/
+    ____        __           _         _______
+   / __ \____  / /___ ______(_)____   / ____(_)___  ____ _____  ________
+  / /_/ / __ \/ / __ `/ ___/ / ___/  / /_  / / __ \/ __ `/ __ \/ ___/ _ \
+ / ____/ /_/ / / /_/ / /  / (__  )  / __/ / / / / / /_/ / / / / /__/  __/
+/_/    \____/_/\__,_/_/  /_/____/  /_/   /_/_/ /_/\__,_/_/ /_/\___/\___/
 
-    http://tomb.finance
+    https://polarisfinance.io
 */
-contract Tomb is ERC20Burnable, Operator {
+contract Polar is ERC20Burnable, Operator {
     using SafeMath8 for uint8;
     using SafeMath for uint256;
 
     // Initial distribution for the first 24h genesis pools
     uint256 public constant INITIAL_GENESIS_POOL_DISTRIBUTION = 11000 ether;
-    // Initial distribution for the day 2-5 TOMB-WFTM LP -> TOMB pool
-    uint256 public constant INITIAL_TOMB_POOL_DISTRIBUTION = 140000 ether;
+    // Initial distribution for the day 2-5 Polar-WFTM LP -> Polar pool
+    uint256 public constant INITIAL_POLAR_POOL_DISTRIBUTION = 140000 ether;
     // Distribution for airdrops wallet
     uint256 public constant INITIAL_AIRDROP_WALLET_DISTRIBUTION = 9000 ether;
 
@@ -34,7 +34,7 @@ contract Tomb is ERC20Burnable, Operator {
 
     /* ================= Taxation =============== */
     // Address of the Oracle
-    address public tombOracle;
+    address public polarOracle;
     // Address of the Tax Office
     address public taxOffice;
 
@@ -68,10 +68,10 @@ contract Tomb is ERC20Burnable, Operator {
     }
 
     /**
-     * @notice Constructs the TOMB ERC-20 contract.
+     * @notice Constructs the POLAR ERC-20 contract.
      */
-    constructor(uint256 _taxRate, address _taxCollectorAddress) public ERC20("TOMB", "TOMB") {
-        // Mints 1 TOMB to contract creator for initial pool setup
+    constructor(uint256 _taxRate, address _taxCollectorAddress) public ERC20("POLAR", "POLAR") {
+        // Mints 1 POLAR to contract creator for initial pool setup
         require(_taxRate < 10000, "tax equal or bigger to 100%");
         require(_taxCollectorAddress != address(0), "tax collector address must be non-zero address");
 
@@ -120,18 +120,18 @@ contract Tomb is ERC20Burnable, Operator {
         burnThreshold = _burnThreshold;
     }
 
-    function _getTombPrice() internal view returns (uint256 _tombPrice) {
-        try IOracle(tombOracle).consult(address(this), 1e18) returns (uint144 _price) {
+    function _getPolarPrice() internal view returns (uint256 _polarPrice) {
+        try IOracle(polarOracle).consult(address(this), 1e18) returns (uint144 _price) {
             return uint256(_price);
         } catch {
-            revert("Tomb: failed to fetch TOMB price from Oracle");
+            revert("Polar: failed to fetch POLAR price from Oracle");
         }
     }
 
-    function _updateTaxRate(uint256 _tombPrice) internal returns (uint256){
+    function _updateTaxRate(uint256 _polarPrice) internal returns (uint256){
         if (autoCalculateTax) {
             for (uint8 tierId = uint8(getTaxTiersTwapsCount()).sub(1); tierId >= 0; --tierId) {
-                if (_tombPrice >= taxTiersTwaps[tierId]) {
+                if (_polarPrice >= taxTiersTwaps[tierId]) {
                     require(taxTiersRates[tierId] < 10000, "tax equal or bigger to 100%");
                     taxRate = taxTiersRates[tierId];
                     return taxTiersRates[tierId];
@@ -148,9 +148,9 @@ contract Tomb is ERC20Burnable, Operator {
         autoCalculateTax = false;
     }
 
-    function setTombOracle(address _tombOracle) public onlyOperatorOrTaxOffice {
-        require(_tombOracle != address(0), "oracle address cannot be 0 address");
-        tombOracle = _tombOracle;
+    function setPolarOracle(address _polarOracle) public onlyOperatorOrTaxOffice {
+        require(_polarOracle != address(0), "oracle address cannot be 0 address");
+        polarOracle = _polarOracle;
     }
 
     function setTaxOffice(address _taxOffice) public onlyOperatorOrTaxOffice {
@@ -183,9 +183,9 @@ contract Tomb is ERC20Burnable, Operator {
     }
 
     /**
-     * @notice Operator mints TOMB to a recipient
+     * @notice Operator mints POLAR to a recipient
      * @param recipient_ The address of recipient
-     * @param amount_ The amount of TOMB to mint to
+     * @param amount_ The amount of POLAR to mint to
      * @return whether the process has been done
      */
     function mint(address recipient_, uint256 amount_) public onlyOperator returns (bool) {
@@ -213,9 +213,9 @@ contract Tomb is ERC20Burnable, Operator {
         bool burnTax = false;
 
         if (autoCalculateTax) {
-            uint256 currentTombPrice = _getTombPrice();
-            currentTaxRate = _updateTaxRate(currentTombPrice);
-            if (currentTombPrice < burnThreshold) {
+            uint256 currentPolarPrice = _getPolarPrice();
+            currentTaxRate = _updateTaxRate(currentPolarPrice);
+            if (currentPolarPrice < burnThreshold) {
                 burnTax = true;
             }
         }
@@ -259,16 +259,16 @@ contract Tomb is ERC20Burnable, Operator {
      */
     function distributeReward(
         address _genesisPool,
-        address _tombPool,
+        address _polarPool,
         address _airdropWallet
     ) external onlyOperator {
         require(!rewardPoolDistributed, "only can distribute once");
         require(_genesisPool != address(0), "!_genesisPool");
-        require(_tombPool != address(0), "!_tombPool");
+        require(_polarPool != address(0), "!_polarPool");
         require(_airdropWallet != address(0), "!_airdropWallet");
         rewardPoolDistributed = true;
         _mint(_genesisPool, INITIAL_GENESIS_POOL_DISTRIBUTION);
-        _mint(_tombPool, INITIAL_TOMB_POOL_DISTRIBUTION);
+        _mint(_polarPool, INITIAL_POLAR_POOL_DISTRIBUTION);
         _mint(_airdropWallet, INITIAL_AIRDROP_WALLET_DISTRIBUTION);
     }
 
